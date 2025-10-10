@@ -119,7 +119,7 @@ echo "🎯 Done."
 # -------------------------------
 # 🖼️ Set Background Wallpaper
 # -------------------------------
-WALLPAPER_URL="https://raw.githubusercontent.com/gggoaaat/ubuntuscript/main/background.jpg"
+WALLPAPER_URL="https://raw.githubusercontent.com/gggoaaat/ubuntuscript/main/background2.jpg"
 WALLPAPER_PATH="$HOME/Pictures/ubuntu-background.jpg"
 
 echo "🖼️ Setting background image..."
