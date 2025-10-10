@@ -145,3 +145,36 @@ if command -v gsettings >/dev/null 2>&1; then
 else
   echo "⚙️ No GNOME desktop detected. Skipping wallpaper setup."
 fi
+
+
+# -------------------------------
+# 🖥️ Plymouth Theme Installation
+# -------------------------------
+echo "🎨 Installing and setting up Plymouth theme..."
+
+sudo apt install -y plymouth plymouth-themes
+
+# Define theme name and paths
+THEME_NAME="client-brand"
+THEME_DIR="/usr/share/plymouth/themes/$THEME_NAME"
+THEME_REPO_URL="https://raw.githubusercontent.com/gggoaaat/ubuntuscript/main/plymouth-theme"
+
+# Create theme directory
+sudo mkdir -p "$THEME_DIR"
+
+# Download theme files
+echo "⬇️  Downloading theme files..."
+sudo curl -fsSL "$THEME_REPO_URL/$THEME_NAME.plymouth" -o "$THEME_DIR/$THEME_NAME.plymouth"
+sudo curl -fsSL "$THEME_REPO_URL/$THEME_NAME.script" -o "$THEME_DIR/$THEME_NAME.script"
+sudo curl -fsSL "$THEME_REPO_URL/logo.png" -o "$THEME_DIR/logo.png"
+
+# Verify files
+if [ ! -f "$THEME_DIR/$THEME_NAME.plymouth" ]; then
+  echo "⚠️  Plymouth theme download failed — skipping."
+else
+  echo "⚙️  Setting Plymouth theme..."
+  sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$THEME_DIR/$THEME_NAME.plymouth" 100
+  sudo update-alternatives --set default.plymouth "$THEME_DIR/$THEME_NAME.plymouth"
+  sudo update-initramfs -u
+  echo "✅ Plymouth theme applied: $THEME_NAME"
+fi
