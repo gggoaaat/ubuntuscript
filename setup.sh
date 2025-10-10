@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 set -e
+
+# -----------------------------------
+# 🧰 Ubuntu Full Stack Setup with Logging
+# -----------------------------------
+
+LOG_DIR="$HOME/setup_logs"
+LOG_FILE="$LOG_DIR/setup-$(date +'%Y%m%d-%H%M').log"
+mkdir -p "$LOG_DIR"
+
+# Redirect stdout (1) and stderr (2) to tee so it shows and logs
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "==============================="
+echo "  🧰 Ubuntu Full Stack Setup"
+echo "  🕓 $(date)"
+echo "  📁 Logging to: $LOG_FILE"
+echo "==============================="
+
+# Trap for any unexpected errors
+trap 'echo "❌ ERROR: Command failed at line $LINENO. Check log: $LOG_FILE"' ERR
+
 echo "==============================="
 echo "  🧰 Ubuntu Full Stack Setup"
 echo "==============================="
@@ -92,3 +113,34 @@ echo "To launch Beremiz manually, run: beremiz &"
 echo "To start a React app: npx create-react-app myapp"
 echo "==============================="
 echo "🎯 Done."
+
+
+
+# -------------------------------
+# 🖼️ Set Background Wallpaper
+# -------------------------------
+WALLPAPER_URL="https://raw.githubusercontent.com/gggoaaat/ubuntuscript/main/background.jpg"
+WALLPAPER_PATH="$HOME/Pictures/ubuntu-background.jpg"
+
+echo "🖼️ Setting background image..."
+
+# Ensure Pictures directory exists
+mkdir -p "$HOME/Pictures"
+
+# Download wallpaper
+if curl -fsSL "$WALLPAPER_URL" -o "$WALLPAPER_PATH"; then
+  echo "Downloaded wallpaper to $WALLPAPER_PATH"
+else
+  echo "⚠️ Failed to download wallpaper. Skipping..."
+  exit 0
+fi
+
+# Check if GNOME is running (for GUI systems)
+if command -v gsettings >/dev/null 2>&1; then
+  # Set both light and dark mode backgrounds
+  gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER_PATH" || true
+  gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER_PATH" || true
+  echo "✅ Wallpaper applied successfully."
+else
+  echo "⚙️ No GNOME desktop detected. Skipping wallpaper setup."
+fi
