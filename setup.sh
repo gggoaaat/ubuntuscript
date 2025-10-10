@@ -19,7 +19,7 @@ echo "  📁 Logging to: $LOG_FILE"
 echo "==============================="
 
 # Trap for any unexpected errors
-#trap 'echo "❌ ERROR: Command failed at line $LINENO. Check log: $LOG_FILE"' ERR
+trap 'echo "❌ ERROR: Command failed at line $LINENO. Check log: $LOG_FILE"' ERR
 
 echo "==============================="
 echo "  🧰 Ubuntu Full Stack Setup"
