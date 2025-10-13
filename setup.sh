@@ -25,13 +25,21 @@ echo "==============================="
 run_remote_script() {
   local script_name="$1"
   local url="$RAW_BASE/scripts/$script_name"
+
+  # individual script log
+  local log_name="${script_name%.sh}.log"
+  local script_log="$LOG_DIR/$log_name"
+
   echo "▶️  Running $script_name ..."
-  if curl -fsSL "$url" | bash; then
-    echo "✅ Finished $script_name"
-  else
-    echo "❌ Error running $script_name"
-    exit 1
-  fi
+  echo "📄 Logging to: $script_log"
+
+  {
+    echo "===== START $script_name $(date) ====="
+    curl -fsSL "$url" | bash
+    echo "===== END $script_name $(date) ====="
+  } > >(tee -a "$script_log" "$LOG_FILE") 2>&1
+
+  echo "✅ Finished $script_name"
   echo ""
 }
 
