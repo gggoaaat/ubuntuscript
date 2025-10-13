@@ -9,6 +9,8 @@ sudo mkdir -p "$THEME_DIR"
 sudo curl -fsSL "$THEME_REPO_URL/$THEME_NAME.plymouth" -o "$THEME_DIR/$THEME_NAME.plymouth"
 sudo curl -fsSL "$THEME_REPO_URL/$THEME_NAME.script" -o "$THEME_DIR/$THEME_NAME.script"
 sudo curl -fsSL "$THEME_REPO_URL/logo.png" -o "$THEME_DIR/logo.png"
+sudo curl -fsSL "$THEME_REPO_URL/background.png" -o "$THEME_DIR/background.png"
+
 
 sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$THEME_DIR/$THEME_NAME.plymouth" 100
 sudo update-alternatives --set default.plymouth "$THEME_DIR/$THEME_NAME.plymouth"
