@@ -16,3 +16,6 @@ sudo npm install -g --unsafe-perm node-red pm2
 pm2 start $(which node-red) --name node-red
 pm2 startup systemd -u $USER --hp $HOME
 pm2 save
+
+
+sudo env PATH=$PATH:/usr/local/bin pm2 startup systemd -u bsy --hp /home/bsy
