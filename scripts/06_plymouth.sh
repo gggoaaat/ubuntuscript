@@ -3,7 +3,7 @@ echo "🎨 Installing Plymouth theme..."
 sudo apt install -y plymouth plymouth-themes
 THEME_NAME="client-brand"
 THEME_DIR="/usr/share/plymouth/themes/$THEME_NAME"
-THEME_REPO_URL="https://raw.githubusercontent.com/gggoaaat/ubuntuscript/main/assets/plymouth-theme"
+THEME_REPO_URL="https://raw.githubusercontent.com/gggoaaat/ubuntuscript/main/client-brand"
 
 sudo mkdir -p "$THEME_DIR"
 sudo curl -fsSL "$THEME_REPO_URL/$THEME_NAME.plymouth" -o "$THEME_DIR/$THEME_NAME.plymouth"
