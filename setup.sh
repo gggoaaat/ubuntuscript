@@ -6,11 +6,17 @@ BRANCH="main"
 RAW_BASE="https://raw.githubusercontent.com/$REPO/$BRANCH"
 
 # --------------------------------------------
-# Logging setup
+# Detect parent run directory (from install.sh)
 # --------------------------------------------
-LOG_DIR="$HOME/setup_logs"
-LOG_FILE="$LOG_DIR/setup-$(date +'%Y%m%d-%H%M').log"
-mkdir -p "$LOG_DIR"
+if [[ -n "$INSTALL_RUN_DIR" && -d "$INSTALL_RUN_DIR" ]]; then
+  LOG_DIR="$INSTALL_RUN_DIR"
+else
+  # fallback if run standalone
+  LOG_DIR="$HOME/setup_logs/$(date +'%Y-%m-%d_%H-%M-%S')"
+  mkdir -p "$LOG_DIR"
+fi
+
+LOG_FILE="$LOG_DIR/setup.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "==============================="
@@ -26,7 +32,7 @@ run_remote_script() {
   local script_name="$1"
   local url="$RAW_BASE/scripts/$script_name"
 
-  # individual script log
+  # individual script log inside same folder
   local log_name="${script_name%.sh}.log"
   local script_log="$LOG_DIR/$log_name"
 
@@ -55,5 +61,5 @@ done
 
 echo "==============================="
 echo "🎯 Setup complete!"
-echo "Logs saved to: $LOG_FILE"
+echo "Logs saved to: $LOG_DIR"
 echo "==============================="
