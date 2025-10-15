@@ -2,55 +2,52 @@
 set -e
 
 echo "==============================="
-echo " 🧩 Installing AnyDesk"
+echo " 🦀 Installing RustDesk (v1.4.2) — Wayland Enabled"
 echo "==============================="
 
-# --- 1. Remove any old versions ---
-sudo apt remove -y anydesk || true
-
-# --- 2. Import AnyDesk GPG key and add repository ---
-wget -qO - https://keys.anydesk.com/repos/DEB-GPG-KEY | sudo gpg --dearmor -o /usr/share/keyrings/anydesk-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/anydesk-archive-keyring.gpg] http://deb.anydesk.com/ all main" | sudo tee /etc/apt/sources.list.d/anydesk.list
-
-# --- 3. Install AnyDesk ---
-sudo apt update -y
-sudo apt install -y anydesk
-
-# --- 4. Enable and start the AnyDesk service ---
-sudo systemctl enable anydesk.service
-sudo systemctl start anydesk.service
-
-# --- 5. Apply Wayland compatibility fix ---
-# Wayland blocks screen capture by default for remote desktop tools.
-# The workaround is to add a policy file under /etc/gdm3/custom.conf or set the environment variable.
-
+# --- 1. Ensure Wayland is ENABLED ---
 WAYLAND_CONF="/etc/gdm3/custom.conf"
-
 if [ -f "$WAYLAND_CONF" ]; then
-  echo "🧩 Applying Wayland fix in $WAYLAND_CONF..."
-  sudo sed -i 's/^#WaylandEnable=false/WaylandEnable=false/' "$WAYLAND_CONF" || true
-
-  # In case the line doesn't exist, append it
-  if ! grep -q "WaylandEnable=false" "$WAYLAND_CONF"; then
-    echo "WaylandEnable=false" | sudo tee -a "$WAYLAND_CONF" >/dev/null
+  echo "🔧 Enabling Wayland in $WAYLAND_CONF..."
+  sudo sed -i 's/^WaylandEnable=false/#WaylandEnable=false/' "$WAYLAND_CONF" || true
+  if ! grep -q "WaylandEnable" "$WAYLAND_CONF"; then
+    echo "#WaylandEnable=false" | sudo tee -a "$WAYLAND_CONF" >/dev/null
   fi
-
-  echo "✅ Wayland disabled for GDM — AnyDesk will use Xorg for compatibility."
+  echo "✅ Wayland enabled successfully."
 else
-  echo "⚠️  $WAYLAND_CONF not found. Skipping Wayland fix (may not be GDM-based system)."
+  echo "⚠️  GDM config not found — skipping Wayland toggle."
 fi
 
-# --- 6. Restart GDM if running under GUI (to apply the change) ---
-if systemctl is-active --quiet gdm; then
-  echo "🔁 Restarting GDM to apply changes..."
-  sudo systemctl restart gdm || echo "⚠️ Could not restart GDM. Please reboot manually."
+# --- 2. Remove AnyDesk if present ---
+if command -v anydesk >/dev/null 2>&1; then
+  echo "🧹 Removing AnyDesk..."
+  sudo systemctl stop anydesk || true
+  sudo apt remove -y anydesk || true
+  sudo rm -f /etc/apt/sources.list.d/anydesk.list
+  sudo rm -f /usr/share/keyrings/anydesk-archive-keyring.gpg
+  sudo apt autoremove -y
 else
-  echo "💡 GDM not active — reboot required for Wayland fix to take effect."
+  echo "ℹ️  AnyDesk not installed — skipping removal."
 fi
 
-# --- 7. Display AnyDesk info ---
+# --- 3. Download & install RustDesk ---
+RUSTDESK_VER="1.4.2"
+RUSTDESK_DEB="rustdesk-${RUSTDESK_VER}-x86_64.deb"
+RUSTDESK_URL="https://github.com/rustdesk/rustdesk/releases/download/${RUSTDESK_VER}/${RUSTDESK_DEB}"
+
+echo "⬇️  Downloading RustDesk ${RUSTDESK_VER}..."
+wget -q "$RUSTDESK_URL" -O "/tmp/${RUSTDESK_DEB}"
+
+echo "📦 Installing RustDesk..."
+sudo apt install -y "/tmp/${RUSTDESK_DEB}"
+
+# --- 4. Enable & start service ---
+echo "⚙️  Enabling RustDesk service..."
+sudo systemctl enable --now rustdesk || true
+
+# --- 5. Done ---
 echo ""
-echo "✅ AnyDesk installed successfully!"
-echo "🔢 Your AnyDesk address:"
-anydesk --get-id || echo "⚠️ Run 'anydesk' manually to view your ID after reboot."
+echo "✅ RustDesk v${RUSTDESK_VER} installed successfully!"
+echo "💡 Wayland is enabled for touchscreen and gestures."
+echo "🔑 Open RustDesk from your apps menu to see your ID and password."
 echo "==============================="
